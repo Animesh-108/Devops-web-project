@@ -8,7 +8,7 @@ The pipeline leverages a suite of AWS DevOps tools to build, test, and deploy th
 
 The workflow is visualized in the following architecture diagram:
 
-![CI/CD Pipeline Architecture](image_architecture.jpg)
+![CI/CD Pipeline Architecture](https://github.com/Animesh-108/Devops-web-project/blob/master/architecture-complete.png)
 
 ## 🛠️ Core Technologies
 
