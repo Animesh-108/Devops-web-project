@@ -52,7 +52,9 @@ This repository is structured to be read by the AWS CI/CD services. Here are the
 
 ---
 
-## ✅ Prerequisites
+## 🚀 How to Deploy 
+
+** ✅ Prerequisites **
 
 To replicate this setup, you will need:
 
@@ -61,3 +63,39 @@ To replicate this setup, you will need:
 * An AWS CodeArtifact domain and repository set up.
 * An S3 bucket for CodePipeline artifacts.
 * Proper IAM roles for CodeBuild and CodeDeploy to access other AWS services.
+
+---
+
+## 🚀 How to Deploy 
+**Deployment Steps:**
+
+1.  **Customize Configuration Files:**
+    * **CloudFormation (`template.yml`):** Modify parameters like VPC CIDR blocks, instance types, Key Pair names, and any specific resource configurations to match your requirements. You might need to adjust IAM roles and security group rules.
+    * **`buildspec.yml`:** Update the build commands based on your project's structure and build tools (e.g., specific Maven goals, Java version). Configure CodeArtifact settings if you are using it.
+    * **`appspec.yml`:** Adjust the `files` section to specify the source artifact (e.g., `.war` file) and its destination on the EC2 instance. Modify the lifecycle hooks (`BeforeInstall`, `AfterInstall`, `ApplicationStart`, etc.) to run the correct scripts for your application server (e.g., Tomcat, Jetty).
+    * **`settings.xml`:** Update repository URLs and credentials if using CodeArtifact or another private repository.
+    * **Application Code:** Replace the example `index.jsp` with your actual application code.
+
+2.  **Provision Infrastructure (CloudFormation):**
+    * Deploy the customized CloudFormation template (`template.yml`) via the AWS Management Console or AWS CLI. This will create the VPC, EC2 instance(s), IAM roles, security groups, and potentially the CodeDeploy application and deployment group.
+    * Ensure the EC2 instances have the CodeDeploy agent installed and configured.
+
+3.  **Set Up CodeArtifact (If Used):**
+    * Create your CodeArtifact domain and repository.
+    * Configure `settings.xml` and `buildspec.yml` to use the CodeArtifact repository endpoint.
+
+4.  **Create the CI/CD Pipeline (CodePipeline):**
+    * Use the AWS Management Console or AWS CLI to create a new CodePipeline.
+    * **Source Stage:** Connect to your GitHub repository (you might need to create an AWS CodeStar connection). Specify the repository and branch.
+    * **Build Stage:** Configure the build stage to use AWS CodeBuild. Point it to the `buildspec.yml` file in your repository. Configure input/output artifacts (source code in, build artifact out to S3). Set up necessary permissions for CodeBuild to access CodeArtifact or other services.
+    * **Deploy Stage:** Configure the deploy stage to use AWS CodeDeploy. Select the CodeDeploy application and deployment group created by CloudFormation (or manually). Specify the build artifact from the S3 bucket as the input.
+
+5.  **Trigger the Pipeline:**
+    * Push a change to your configured GitHub branch.
+    * CodePipeline should automatically detect the change and execute the source, build, and deploy stages.
+
+6.  **Verify Deployment:**
+    * Access the public IP address or DNS name of your EC2 instance (or Load Balancer) in a web browser to verify that your application has been deployed successfully.
+    * Monitor the pipeline execution status in the AWS CodePipeline console. Check logs in CodeBuild and CodeDeploy for any errors.
+
+**Note:** This is a high-level overview. Each step involves detailed configuration within the respective AWS services. Refer to the official AWS documentation for specific setup instructions.
